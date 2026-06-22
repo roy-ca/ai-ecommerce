@@ -4,6 +4,7 @@ import com.roy.ecommerce.dto.LoginRequest;
 import com.roy.ecommerce.exception.UserAlreadyExistsException;
 import com.roy.ecommerce.model.User;
 import com.roy.ecommerce.repository.UserRepository;
+import com.roy.ecommerce.util.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +13,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     public User register(User user) {
@@ -38,6 +41,6 @@ public class UserService {
             throw new RuntimeException("Invalid Password");
         }
 
-        return "Login Successful";
+        return jwtUtil.generateToken(user.getEmail());
     }
 }
