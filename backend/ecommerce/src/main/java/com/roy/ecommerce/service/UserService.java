@@ -2,6 +2,7 @@ package com.roy.ecommerce.service;
 
 import com.roy.ecommerce.dto.LoginRequest;
 import com.roy.ecommerce.exception.UserAlreadyExistsException;
+import com.roy.ecommerce.model.Role;
 import com.roy.ecommerce.model.User;
 import com.roy.ecommerce.repository.UserRepository;
 import com.roy.ecommerce.util.JwtUtil;
@@ -28,6 +29,7 @@ public class UserService {
 
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
+        user.setRole(Role.USER);
         return userRepository.save(user);
     }
 

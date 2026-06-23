@@ -3,6 +3,7 @@ package com.roy.ecommerce.config;
 import com.roy.ecommerce.security.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,6 +26,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/error").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/products/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/products/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/products/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
