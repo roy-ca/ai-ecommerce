@@ -18,13 +18,15 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ProductRepository productRepository;
+    private final OrderEventProducer orderEventProducer;
 
-    public OrderService(UserRepository userRepository, CartItemRepository cartItemRepository, OrderRepository orderRepository, OrderItemRepository orderItemRepository, ProductRepository productRepository) {
+    public OrderService(UserRepository userRepository, CartItemRepository cartItemRepository, OrderRepository orderRepository, OrderItemRepository orderItemRepository, ProductRepository productRepository, OrderEventProducer orderEventProducer) {
         this.userRepository = userRepository;
         this.cartItemRepository = cartItemRepository;
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.productRepository = productRepository;
+        this.orderEventProducer = orderEventProducer;
     }
 
     @Transactional
@@ -81,6 +83,8 @@ public class OrderService {
         }
 
         cartItemRepository.deleteAll(cartItems);
+
+        orderEventProducer.sendOrderCreatedEvent(savedOrder.getId());
         return mapToResponse(savedOrder, orderItems);
     }
 

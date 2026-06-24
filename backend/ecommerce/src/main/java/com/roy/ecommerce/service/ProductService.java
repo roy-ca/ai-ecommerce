@@ -5,6 +5,9 @@ import com.roy.ecommerce.dto.ProductResponse;
 import com.roy.ecommerce.exception.ProductNotFoundException;
 import com.roy.ecommerce.model.Product;
 import com.roy.ecommerce.repository.ProductRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +20,7 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
+    @CacheEvict(value = "products", allEntries = true)
     public ProductResponse addProduct(ProductRequest productRequest) {
         Product product = new Product();
 
@@ -38,12 +42,17 @@ public class ProductService {
                 .toList();
     }
 
+    @Cacheable(value = "products", key = "#id")
     public ProductResponse getProductById(Long id) {
+
+        System.out.println("Fetching product from DB");
+
        Product product =  productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found"));
        return mapToResponse(product);
     }
 
+    @CachePut(value = "products", key = "#id")
     public ProductResponse updateProduct(Long id, ProductRequest updatedProduct) {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found"));
@@ -60,6 +69,7 @@ public class ProductService {
 
     }
 
+    @CacheEvict(value = "products", allEntries = true)
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found"));
